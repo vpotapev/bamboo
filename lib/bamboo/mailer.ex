@@ -58,6 +58,8 @@ defmodule Bamboo.Mailer do
   with: use Bamboo.Mailer, otp_app: :my_app
   """
 
+  @debug_output_enabled Application.get_env(:bamboo, :debug_output_enabled, false)
+
   require Logger
   alias Bamboo.Formatter
 
@@ -180,23 +182,27 @@ defmodule Bamboo.Mailer do
   end
 
   defp debug_sent(email, adapter) do
-    Logger.debug(fn ->
-      """
-      Sending email with #{inspect(adapter)}:
+    if @debug_output_enabled do
+      Logger.debug(fn ->
+        """
+        Sending email with #{inspect(adapter)}:
 
-      #{inspect(email, limit: 150)}
-      """
-    end)
+        #{inspect(email, limit: 150)}
+        """
+      end)
+    end
   end
 
   defp debug_unsent(email) do
-    Logger.debug(fn ->
-      """
-      Email was not sent because recipients are empty.
+    if @debug_output_enabled do
+      Logger.debug(fn ->
+        """
+        Email was not sent because recipients are empty.
 
-      Full email - #{inspect(email, limit: 150)}
-      """
-    end)
+        Full email - #{inspect(email, limit: 150)}
+        """
+      end)
+    end
   end
 
   defp validate_and_normalize(email, adapter) do
